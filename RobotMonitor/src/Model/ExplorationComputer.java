@@ -91,6 +91,10 @@ public abstract class ExplorationComputer {
 		return coverageRate;
 	}
 	
+	public CustomizedArena getExploredArena(){
+		return this.exploredMap;
+	}
+	
 	//Return null if no further action needed
 	public abstract Action getNextStep(Robot robot);
 
