@@ -11,6 +11,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import Model.*;
+import Model.RobotMonitorModel.RobotMonitorModelException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -99,6 +100,9 @@ public class RobotMonitorController implements Initializable {
 	TextField ipTextField ;
 	
 	@FXML
+	TextField portTextField;
+	
+	@FXML
 	Button connectionButton;
 	
 	//TODO
@@ -108,13 +112,14 @@ public class RobotMonitorController implements Initializable {
 
 	private Rectangle[][] recs;
 
+	private RobotMonitorModel model;
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		initControlWidgets();
 		initConnectionWidgets();
 		setConnectionWidgetsDisabled(false);
-		//TODO
-		//May add blocks here
+		addBlocks(rowCount, colCount, 12);
+		
 	}
 
 	private void initConnectionWidgets() {
@@ -141,6 +146,7 @@ public class RobotMonitorController implements Initializable {
 		this.initRowChoiceBox.setDisable(value);
 		this.initOrientationChoiceBox.setDisable(value);
 		this.ipTextField.setEditable(!value);
+		this.portTextField.setEditable(!value);
 		this.connectionButton.setDisable(value);
 
 
@@ -402,7 +408,7 @@ public class RobotMonitorController implements Initializable {
 			System.out.println("onBackwardPressed");
 		}
 		String actionDescription = this.model.backward();
-		this.msgLabel.setText(actionDescription);
+		setMessage(actionDescription);
 		refleshView();
 		if(!this.model.hasPreStep()){
 			this.msgLabel.setText("Start");
@@ -417,7 +423,7 @@ public class RobotMonitorController implements Initializable {
 			System.out.println("onForwardPressed");
 		}
 		String actionDescription  = this.model.forward();
-		this.msgLabel.setText(actionDescription);
+		setMessage(actionDescription);
 
 		refleshView();
 		if(!this.model.hasNextStep()){
@@ -503,6 +509,7 @@ public class RobotMonitorController implements Initializable {
 			System.out.println("onResetPressed");
 		}
 		String ipAddress = this.ipTextField.getText();
+		String portStr = this.portTextField.getText();
 		int initSouthWestRowID = Integer.parseInt(this.initRowChoiceBox.getValue());
 		int initSouthWestColID = Integer.parseInt(this.initColChoiceBox.getValue());
 		Orientation initOrientation = getOrientationFromString(this.initOrientationChoiceBox.getValue());
@@ -511,9 +518,25 @@ public class RobotMonitorController implements Initializable {
 								initSouthWestColID,
 								GlobalUtil.robotDiamterInCellNum,
 								initOrientation, 3);
-		
-		//Create the model 
-		//TODO
+		this.setMessage("Connecting...");
+		try {
+			this.model = new RobotMonitorModel(robot, 
+											  ipAddress, portStr,
+											  rowCount, colCount, 
+											  GlobalUtil.startSouthWestBlock, 
+											  GlobalUtil.goalSouthWestBlock);
+		} catch (RobotMonitorModelException e) {
+			this.model = null;
+			setMessage("Connection Failed: " + e.getMessage());
+			return;
+		}
+		this.setConnectionWidgetsDisabled(true);
+		this.setMessage("Connection Succeeded...");
+	
+	}
+
+	private void setMessage(String msg) {
+		this.msgLabel.setText(msg);
 	}
 
 	private Orientation getOrientationFromString(String value) {
