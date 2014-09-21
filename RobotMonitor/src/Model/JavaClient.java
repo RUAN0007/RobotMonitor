@@ -12,7 +12,7 @@ public class JavaClient {
    private Socket socket = null;
    private BufferedReader reader = null;
    private BufferedWriter writer = null;
-
+   
    public JavaClient(InetAddress address, int port) throws IOException
    {
       socket = new Socket(address, port);
@@ -34,6 +34,12 @@ public class JavaClient {
    public String sendForResponse(String msg) throws IOException{
 	   this.send(msg);
 	   return this.recv();
+   }
+   
+   public void close() throws IOException{
+	   this.reader.close();
+	   this.writer.close();
+	   this.socket.close();
    }
     /**
      * @param args the command line arguments
