@@ -316,4 +316,7 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 		return count;
 	}
 	
+	public double getCoverage(){
+		return this.explorationComputer.getCoverage();
+	}
 }
