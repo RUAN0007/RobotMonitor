@@ -12,6 +12,7 @@ import java.util.TimerTask;
 
 import Model.*;
 import Model.RobotMonitorModel.RobotMonitorModelException;
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -402,18 +403,28 @@ public class RobotMonitorController implements Initializable {
 		}
 	}
 	
+	private boolean missionCompleted = false;
 	@FXML
 	public void onBackwardPressed(){
 		if(GlobalUtil.ViewDEBUG){
 			System.out.println("onBackwardPressed");
 		}
-		String actionDescription = this.model.backward();
-		setMessage(actionDescription);
-		refleshView();
-		if(!this.model.hasPreStep()){
-			this.msgLabel.setText("Start");
-			this.backwardButton.setDisable(true);
+		String actionDescription = null;
+		try {
+			actionDescription = this.model.backward();
+			if(actionDescription == null){
+				actionDescription = "Already at start";
+				this.backwardButton.setDisable(true);
+			}
+		} catch (IOException e) {
+			setMessage(e.getMessage());
+			this.onResetPressed(null);
+			return;
 		}
+		setMessage(actionDescription);
+		missionCompleted = false;
+		refleshView();
+		
 		this.forwardButton.setDisable(false);
 	}
 	
@@ -422,21 +433,29 @@ public class RobotMonitorController implements Initializable {
 		if(GlobalUtil.ViewDEBUG){
 			System.out.println("onForwardPressed");
 		}
-		String actionDescription  = this.model.forward();
+		String actionDescription = null;
+		try {
+			actionDescription = this.model.forward();
+			if(actionDescription == null){
+				actionDescription = "Mission Completed...";
+				missionCompleted = true;
+				this.forwardButton.setDisable(true);
+			}
+		} catch (IOException e) {
+			setMessage(e.getMessage());
+			this.onResetPressed(null);
+			return;
+		}
 		setMessage(actionDescription);
 
 		refleshView();
-		if(!this.model.hasNextStep()){
-			this.msgLabel.setText("Goal");
-
-			this.forwardButton.setDisable(true);
-		}
+		
 		this.backwardButton.setDisable(false);
 	}
 	
-	@FXML
 	Timer timer = null;
-	public void onStartPausedPressed(ActionEvent e ){
+	@FXML
+	public void onStartPausedPressed(ActionEvent e){
 		if(GlobalUtil.ViewDEBUG){
 			System.out.println("onStartPausedPressed");
 		}
@@ -451,51 +470,47 @@ public class RobotMonitorController implements Initializable {
 			timer = new Timer();
 			double secondPerStep = Double.parseDouble(this.secondsPerStepChoiceBox.getValue());
 			long millisecondPerStep = (long)( 1000 * secondPerStep);
-			timer.scheduleAtFixedRate(new TimerTask() {
-				
-				@Override
-				public void run() {
-					model.forward();
-					boolean hasNextStep = model.hasNextStep();
-					Platform.runLater(new Runnable() {
-						
-						@Override
-						public void run() {
-							//Update the view in JavaFX thread
-							refleshView();
-							if(!hasNextStep){
-								startpausedButton.setSelected(false);
-								onPausedPressed();
-
-							}
-						} //End of run() in Runnuble
-					}); //End of runLater() method
-					
-				}//End of run() in TimerTask
-			}, 1000,  millisecondPerStep);
-			
+			forwardWithFrequency(millisecondPerStep);
 		}else{
 			//Pause button is pressed
 			onPausedPressed();
 		}
 	}
 	
+	private void forwardWithFrequency(long delay) {
+		if(missionCompleted){
+			this.onPausedPressed();
+		}else{
+			this.onForwardPressed(null);
+			this.timer = new Timer();
+			timer.schedule(new TimerTask() {
+				
+				@Override
+				public void run() {
+					Platform.runLater(new Runnable() {
+						
+						@Override
+						public void run() {
+							//Recursive call
+							forwardWithFrequency(delay);
+						} //End of run()
+					});//End of runLater() method
+				}//End of run
+			}, delay);//End of schedule task
+		}
+	}
+
 	protected void onPausedPressed() {
-//		TODO
 		timer.cancel();
 		startpausedButton.setText("Start");
 		this.resetButton.setDisable(false);
-		if(model.hasNextStep()){
-			this.forwardButton.setDisable(false);
-		}
-		if(model.hasPreStep()){
-			this.backwardButton.setDisable(false);
-		}
-		
 	}
+	
 	@FXML
 	public void onResetPressed(ActionEvent e){
 		this.setConnectionWidgetsDisabled(false);
+		this.startpausedButton.setSelected(false);
+		this.startpausedButton.setText("Start");
 		if(GlobalUtil.ViewDEBUG){
 			System.out.println("onResetPressed");
 		}
