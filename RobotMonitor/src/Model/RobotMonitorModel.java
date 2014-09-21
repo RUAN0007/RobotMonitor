@@ -3,7 +3,11 @@ package Model;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
+import Model.ArenaTemplate.CellState;
 import Model.ExplorationComputer.ExplorationEnvironment;
 
 public class RobotMonitorModel implements ExplorationEnvironment{
@@ -35,6 +39,7 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 	private int rowCount;
 	private int colCount;
 	private Cell[][] status;
+	private Map<Block,CellState> exploredCells = new HashMap<>();
 	
 	public RobotMonitorModel(Robot robot, String ipAddress, String portStr,
 			int rowCount,int colCount,
@@ -55,17 +60,28 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 		try {
 			InetAddress ip = InetAddress.getByName(ipAddress);
 			this.rpi = new JavaClient(ip, Integer.parseInt(portStr));
-
+			this.exploredCells = this.parseRpiCommand(this.rpi.recv());
+			this.explorationComputer.explore();
 		} catch (NumberFormatException | IOException e) {
 			throw new RobotMonitorModelException(1, e.getMessage());
 		}
 		
 	}
 
+	private Map<Block, CellState> parseRpiCommand(String recv) {
+		// TODO Auto-generated method stub
+		//Parse the command from robot based on protocol
+		return null;
+	}
+
 	@Override
 	public void explore(CustomizedArena exploredMap) {
-		// TODO Auto-generated method stub
-		
+		for(Map.Entry<Block, CellState> exploredCell : this.exploredCells.entrySet()){
+			int rowID = exploredCell.getKey().getRowID(); 
+			int colID = exploredCell.getKey().getColID();
+			CellState state = exploredCell.getValue();
+			exploredMap.setCellState(rowID, colID, state);
+        }
 	}
 
 	public void reset() {
@@ -178,5 +194,106 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 	public Cell getCellStatus(int rowID,int colID){
 		return this.status[rowID][colID];
 	}
+	
+	private ArrayList<Action> actions = new ArrayList<>();
+	private int actionPointer = -1; //Point to the index of lastly executed action
+	private boolean finishExploration = false;
+	private static final String ACK = "ACK";
+	private static final String FINISH = "FINISH";
+	
+	//return null if no previous step
+	public String backward() throws IOException{
+		if(this.actionPointer < 0) return null;
+		Action preAction = this.actions.get(actionPointer);
+		this.actionPointer--;
+		moveRobot(Action.revert(preAction));
+		return preAction.toString();
+	}
+	
+	//return null if no further steps
+	public String forward() throws IOException{
+		Action nextExploredAction = null;
+		if(actionPointer == actions.size() - 1){
+			nextExploredAction = this.explorationComputer.getNextStep(this.robot);
+			if(nextExploredAction == null){
+				//Exploration has finished
+				if(!finishExploration){
+					finishExploration = true;
+					String response = this.rpi.sendForResponse(FINISH);
+					assert(response.equals(ACK)):"The ACK is wrong";
+					
+					//Compute round trip fastest path from start to goal
+					ArrayList<Action> roundTripActionFastestPath 
+					= getRoundTripFastestPath(this.robot,
+											this.explorationComputer.getExploredArena());
+					this.actions.addAll(roundTripActionFastestPath);
+					return "Exploration Finished";
+				}else{
+					if(this.rpi != null){
+						this.rpi.close();
+						this.rpi = null;
+					}
+					return null;
+				}
+				
+			}else{
+				//Still on exploration phase
+				this.actions.add(nextExploredAction);
+			}
+		}
+		
+		this.actionPointer++;
+		Action nextAction = this.actions.get(actionPointer);
+		
+		
+		moveRobot(nextAction);
+		return nextAction.toString();
+	}
+
+	private void moveRobot(Action nextAction) throws IOException {
+		String response = this.rpi.sendForResponse(nextAction.toString());
+		if(finishExploration){
+			assert(response.equals(ACK)):"The ACK is wrong";
+		}else{
+			this.exploredCells = parseRpiCommand(response);
+			this.explorationComputer.explore();
+		}
+		
+		this.robot.move(nextAction);
+		this.updateStatus();
+	}
+
+	private ArrayList<Action> getRoundTripFastestPath(Robot robot, CustomizedArena arena) {
+		ArrayList<Action> roundTrip = new ArrayList<>();
+		ArrayList<Action> oneWayTrip = this.pathComputer.computeForFastestPath(arena, 
+																			robot, 
+																			this.goalSouthWestBlock.getRowID(), 
+																			this.goalSouthWestBlock.getColID());
+		roundTrip.addAll(oneWayTrip);
+		
+		//Reverse the orientation
+		roundTrip.add(Action.TURN_LEFT);
+		roundTrip.add(Action.TURN_LEFT);
+		ArrayList<Action> returnTrip = reverseTrip(oneWayTrip);
+		roundTrip.addAll(returnTrip);
+		return roundTrip;
+	}
+
+	private ArrayList<Action> reverseTrip(ArrayList<Action> oneWayTrip) {
+		ArrayList<Action> returnTrip = new ArrayList<Action>();
+		for(	int actionID = oneWayTrip.size() - 1;actionID>=0;actionID--){
+			Action action = oneWayTrip.get(actionID);
+			if(action.equals(Action.TURN_LEFT)){
+				returnTrip.add(Action.TURN_RIGHT);
+			}else if(action.equals(Action.TURN_RIGHT)){
+				returnTrip.add(Action.TURN_LEFT);
+			}else{
+				returnTrip.add(action.clone());
+			}
+		}
+		return returnTrip;
+	}
+	
+	
 	
 }
