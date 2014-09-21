@@ -12,7 +12,6 @@ import java.util.TimerTask;
 
 import Model.*;
 import Model.RobotMonitorModel.RobotMonitorModelException;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -106,8 +105,7 @@ public class RobotMonitorController implements Initializable {
 	@FXML
 	Button connectionButton;
 	
-	//TODO
-	//FastPathModel model = null;
+
 
 	private Stage stage;
 
@@ -229,13 +227,11 @@ public class RobotMonitorController implements Initializable {
 
 	@FXML 
 	void onDescriptorSaved(){
-		//TODO
-		//		  if(this.model == null) {
-		//			  this.setMessageBoxText("The model is null");
-		//			  return;
-		//		  }
-		//		  String description = this.model.getExploredDescriptor();
-		String description = null;
+	  if(this.model == null) {
+		  this.setMessage("The model is null");
+		  return;
+	  }
+	  String description = this.model.getExploredDescriptor();
 
 
 
@@ -258,22 +254,29 @@ public class RobotMonitorController implements Initializable {
 
 
 	private void refleshView() {
-		//TODO
-		//		int rowCount = this.model.getArenaRowCount();
-		//		int colCount = this.model.getArenaColCount();
-		//		
-		//		for(int rowID = 0;rowID < rowCount; rowID++){
-		//			for(int colID = 0;colID < colCount;colID++){
-		//				Rectangle rectToPaint = getRectangle(rowID,colID);
-		//				assert(rectToPaint != null);
-		//				Cell cellModel = this.model.getCellStatus(rowID, colID);
-		//				paintRectBasedOnStatus(rectToPaint,cellModel);
-		//			}
-		//		}
-		//		
-		//		this.stepCountLabel.setText("" + this.model.getCurrentStepCount());
-		//		this.turnCountLabel.setText("" + this.model.getCurrentTurnCount());
-		//		this.coverageLabel.setText();
+				
+				for(int rowID = 0;rowID < rowCount; rowID++){
+					for(int colID = 0;colID < colCount;colID++){
+						Rectangle rectToPaint = getRectangle(rowID,colID);
+						assert(rectToPaint != null);
+						Cell cellModel = this.model.getCellStatus(rowID, colID);
+						paintRectBasedOnStatus(rectToPaint,cellModel);
+					}
+				}
+				
+				this.stepCountLabel.setText("" + this.model.getCurrentStepCount());
+				this.turnCountLabel.setText("" + this.model.getCurrentTurnCount());
+				double coverage = this.model.getExploredCoverage();
+				this.coverageLabel.setText(roundToDigitsAfterDecimal(coverage,2));
+	}
+
+	private String roundToDigitsAfterDecimal(double coverage, int digitsAfterDecimal) {
+		long base = 1;
+		for(int digit = 0;digit < digitsAfterDecimal;digit++){
+			base *= 10;
+		}
+		double result = (double)((long)(coverage * base)) / (double)base;
+		return "" + result;
 	}
 
 	private void paintRectBasedOnStatus(Rectangle rectToPaint, Cell cellModel) {
