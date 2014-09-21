@@ -67,4 +67,8 @@ public class Action {
 			return null;
 		}
 	}
+	
+	public Action clone(){
+		return new Action(this.action);
+	}
 }
