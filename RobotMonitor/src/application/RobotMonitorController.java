@@ -1,5 +1,6 @@
 package application;
 
+import java.awt.TextField;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -9,7 +10,7 @@ import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import Model.Cell;
+import Model.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -40,8 +41,8 @@ public class RobotMonitorController implements Initializable {
 	private static Color START_COLOR = Color.ALICEBLUE;
 	private static Color GOAL_COLOR = Color.ANTIQUEWHITE;
 	
-	private int rowCount;
-	private int colCount;
+	private int rowCount = GlobalUtil.rowCount;
+	private int colCount = GlobalUtil.colCount;
 	@FXML
 	GridPane arena;
 
@@ -85,7 +86,21 @@ public class RobotMonitorController implements Initializable {
 	@FXML
 	ChoiceBox<String> secondsPerStepChoiceBox;
 
-
+	@FXML
+	ChoiceBox<String> initRowChoiceBox;
+	
+	@FXML
+	ChoiceBox<String> initColChoiceBox;
+	
+	@FXML
+	ChoiceBox<String> initOrientationChoiceBox;
+	
+	@FXML
+	TextField ipTextField ;
+	
+	@FXML
+	Button connectionButton;
+	
 	//TODO
 	//FastPathModel model = null;
 
@@ -95,6 +110,43 @@ public class RobotMonitorController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		initControlWidgets();
+		initConnectionWidgets();
+		setConnectionWidgetsDisabled(false);
+		//TODO
+		//May add blocks here
+	}
+
+	private void initConnectionWidgets() {
+		for(int rowID = 1;rowID <= this.rowCount;rowID++){
+			initRowChoiceBox.getItems().add("" + rowID);
+		}
+		initRowChoiceBox.setValue("1");
+		
+		for(int colID = 1;colID <= this.colCount;colID++){
+			initColChoiceBox.getItems().add("" + colID);
+		}
+		initColChoiceBox.setValue("1");
+		
+		
+		initOrientationChoiceBox.getItems().add(Orientation.NORTH.toString());
+		initOrientationChoiceBox.getItems().add(Orientation.EAST.toString());
+		initOrientationChoiceBox.getItems().add(Orientation.SOUTH.toString());
+		initOrientationChoiceBox.getItems().add(Orientation.WEST.toString());
+		initOrientationChoiceBox.setValue(Orientation.NORTH.toString());
+	}
+	
+	private void setConnectionWidgetsDisabled(boolean value){
+		this.initColChoiceBox.setDisable(value);
+		this.initRowChoiceBox.setDisable(value);
+		this.initOrientationChoiceBox.setDisable(value);
+		this.ipTextField.setEditable(!value);
+		this.connectionButton.setDisable(value);
+
+
+	}
+
+	private void initControlWidgets() {
 		startpausedButton.setDisable(true);
 		forwardButton.setDisable(true);
 		backwardButton.setDisable(true);
@@ -105,9 +157,6 @@ public class RobotMonitorController implements Initializable {
 		secondsPerStepChoiceBox.getItems().add("1");
 		secondsPerStepChoiceBox.getItems().add("2");
 		secondsPerStepChoiceBox.setValue("1");
-
-		//TODO
-		//May add blocks here
 	}
 
 	private void addBlocks(int rowCount,int columnCount,int indexFont) {
@@ -440,11 +489,48 @@ public class RobotMonitorController implements Initializable {
 	}
 	@FXML
 	public void onResetPressed(ActionEvent e){
+		this.setConnectionWidgetsDisabled(false);
 		if(GlobalUtil.ViewDEBUG){
 			System.out.println("onResetPressed");
 		}
 		this.model.reset();
 		this.refleshView();
+	}
+	
+	@FXML
+	public void onConnectPressed(){
+		if(GlobalUtil.ViewDEBUG){
+			System.out.println("onResetPressed");
+		}
+		String ipAddress = this.ipTextField.getText();
+		int initSouthWestRowID = Integer.parseInt(this.initRowChoiceBox.getValue());
+		int initSouthWestColID = Integer.parseInt(this.initColChoiceBox.getValue());
+		Orientation initOrientation = getOrientationFromString(this.initOrientationChoiceBox.getValue());
+		
+		Robot robot = new Robot(initSouthWestRowID, 
+								initSouthWestColID,
+								GlobalUtil.robotDiamterInCellNum,
+								initOrientation, 3);
+		
+		//Create the model 
+		//TODO
+	}
+
+	private Orientation getOrientationFromString(String value) {
+		if(value.equals(Orientation.NORTH.toString())){
+			return Orientation.NORTH;
+		}
+		if(value.equals(Orientation.SOUTH.toString())){
+			return Orientation.SOUTH;
+		}
+		if(value.equals(Orientation.EAST.toString())){
+			return Orientation.EAST;
+		}
+		if(value.equals(Orientation.WEST.toString())){
+			return Orientation.WEST;
+		}
+		assert(false):"Should not reach here. No other orientation available...";
+		return null;
 	}
 
 }
