@@ -62,7 +62,7 @@ public abstract class FastestPathComputer {
 				boolean obstacleInArea = false;
 				for(int rowSpan = 0;rowSpan < robotDiameterInCellNum;rowSpan++){
 					for(int colSpan = 0;colSpan < robotDiameterInCellNum;colSpan++){
-						if(arena.getCell(rowID - rowSpan,colID + colSpan) == CellState.OBSTACLE){
+						if(arena.getCell(rowID - rowSpan,colID + colSpan) != CellState.EMPTY){
 							obstacleInArea = true;
 						}
 					}
