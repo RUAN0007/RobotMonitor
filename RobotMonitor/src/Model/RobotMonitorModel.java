@@ -196,16 +196,16 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 	}
 	
 	private ArrayList<Action> actions = new ArrayList<>();
-	private int actionPointer = -1; //Point to the index of lastly executed action
+	private int actionIndex = -1; //Point to the index of lastly executed action
 	private boolean finishExploration = false;
 	private static final String ACK = "ACK";
 	private static final String FINISH = "FINISH";
 	
 	//return null if no previous step
 	public String backward() throws IOException{
-		if(this.actionPointer < 0) return null;
-		Action preAction = this.actions.get(actionPointer);
-		this.actionPointer--;
+		if(this.actionIndex < 0) return null;
+		Action preAction = this.actions.get(actionIndex);
+		this.actionIndex--;
 		moveRobot(Action.revert(preAction));
 		return preAction.toString();
 	}
@@ -213,7 +213,7 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 	//return null if no further steps
 	public String forward() throws IOException{
 		Action nextExploredAction = null;
-		if(actionPointer == actions.size() - 1){
+		if(actionIndex == actions.size() - 1){
 			nextExploredAction = this.explorationComputer.getNextStep(this.robot);
 			if(nextExploredAction == null){
 				//Exploration has finished
@@ -242,8 +242,8 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 			}
 		}
 		
-		this.actionPointer++;
-		Action nextAction = this.actions.get(actionPointer);
+		this.actionIndex++;
+		Action nextAction = this.actions.get(actionIndex);
 		
 		
 		moveRobot(nextAction);
@@ -294,6 +294,26 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 		return returnTrip;
 	}
 	
+	public int getCurrentTurnCount(){
+		int count = 0;
+		for (int actionID = 0;actionID <= actionIndex;actionID++){
+			if(actions.get(actionID) == Action.TURN_LEFT 
+				|| actions.get(actionID) == Action.TURN_RIGHT){
+				count++;
+			}
+		}
+		return count;
+	}
 	
+	public int getCurrentStepCount(){
+		int count = 0;
+		for (int actionID = 0;actionID <= actionIndex;actionID++){
+			if(actions.get(actionID) == Action.MOVE_FORWARD 
+				|| actions.get(actionID) == Action.DRAW_BACK){
+				count++;
+			}
+		}
+		return count;
+	}
 	
 }
