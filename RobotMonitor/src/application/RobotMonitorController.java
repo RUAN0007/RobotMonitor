@@ -125,12 +125,12 @@ public class RobotMonitorController implements Initializable {
 		for(int rowID = 1;rowID <= this.rowCount;rowID++){
 			initRowChoiceBox.getItems().add("" + rowID);
 		}
-		initRowChoiceBox.setValue("1");
+		initRowChoiceBox.setValue("10");
 		
 		for(int colID = 1;colID <= this.colCount;colID++){
 			initColChoiceBox.getItems().add("" + colID);
 		}
-		initColChoiceBox.setValue("1");
+		initColChoiceBox.setValue("6");
 		
 		
 		initOrientationChoiceBox.getItems().add(Orientation.NORTH.toString());
@@ -439,7 +439,9 @@ public class RobotMonitorController implements Initializable {
 			if(actionDescription == null){
 				actionDescription = "Mission Completed...";
 				missionCompleted = true;
-				this.forwardButton.setDisable(true);
+				setControlWidgetsDisabled(true);
+			}else{
+				this.backwardButton.setDisable(false);
 			}
 		} catch (IOException e) {
 			setMessage(e.getMessage());
@@ -450,7 +452,13 @@ public class RobotMonitorController implements Initializable {
 
 		refleshView();
 		
-		this.backwardButton.setDisable(false);
+	}
+
+	private void setControlWidgetsDisabled(boolean value) {
+		this.forwardButton.setDisable(value);
+		this.backwardButton.setDisable(value);
+		this.startpausedButton.setDisable(value);
+		this.resetButton.setDisable(value);
 	}
 	
 	Timer timer = null;
@@ -509,6 +517,7 @@ public class RobotMonitorController implements Initializable {
 	@FXML
 	public void onResetPressed(ActionEvent e){
 		this.setConnectionWidgetsDisabled(false);
+		this.setControlWidgetsDisabled(true);
 		this.startpausedButton.setSelected(false);
 		this.startpausedButton.setText("Start");
 		if(GlobalUtil.ViewDEBUG){
@@ -525,8 +534,8 @@ public class RobotMonitorController implements Initializable {
 		}
 		String ipAddress = this.ipTextField.getText();
 		String portStr = this.portTextField.getText();
-		int initSouthWestRowID = Integer.parseInt(this.initRowChoiceBox.getValue());
-		int initSouthWestColID = Integer.parseInt(this.initColChoiceBox.getValue());
+		int initSouthWestRowID = Integer.parseInt(this.initRowChoiceBox.getValue()) - 1;
+		int initSouthWestColID = Integer.parseInt(this.initColChoiceBox.getValue()) - 1;
 		Orientation initOrientation = getOrientationFromString(this.initOrientationChoiceBox.getValue());
 		
 		Robot robot = new Robot(initSouthWestRowID, 
