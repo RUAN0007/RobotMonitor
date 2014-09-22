@@ -1,6 +1,5 @@
 package application;
 
-import java.awt.TextField;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -20,6 +19,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
@@ -548,7 +548,7 @@ public class RobotMonitorController implements Initializable {
 			setMessage("Connection Failed: " + e.getMessage());
 			return;
 		}
-		this.setConnectionWidgetsDisabled(true);
+		this.setConnectionWidgetsDisabled(false);
 		this.setMessage("Connection Succeeded...");
 	
 	}
@@ -572,6 +572,10 @@ public class RobotMonitorController implements Initializable {
 		}
 		assert(false):"Should not reach here. No other orientation available...";
 		return null;
+	}
+
+	public void setStage(Stage primaryStage) {
+		this.stage = primaryStage;
 	}
 
 }
