@@ -350,9 +350,6 @@ public class RobotMonitorController implements Initializable {
 			this.cellTypeLabel.setText("---");
 			this.demoCell.setFill(UNEXPLORED_COLOR);
 		}
-
-
-
 	}
 
 
@@ -548,7 +545,10 @@ public class RobotMonitorController implements Initializable {
 			setMessage("Connection Failed: " + e.getMessage());
 			return;
 		}
-		this.setConnectionWidgetsDisabled(false);
+		this.setConnectionWidgetsDisabled(true);
+		this.startpausedButton.setDisable(false);
+		this.forwardButton.setDisable(false);
+		this.refleshView();
 		this.setMessage("Connection Succeeded...");
 	
 	}
