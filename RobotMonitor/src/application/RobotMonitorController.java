@@ -436,10 +436,13 @@ public class RobotMonitorController implements Initializable {
 		String actionDescription = null;
 		try {
 			actionDescription = this.model.forward();
+			
 			if(actionDescription == null){
 				actionDescription = "Mission Completed...";
 				missionCompleted = true;
 				setControlWidgetsDisabled(true);
+				setConnectionWidgetsDisabled(false);
+				this.resetButton.setDisable(false);
 			}else{
 				this.backwardButton.setDisable(false);
 			}
@@ -523,7 +526,11 @@ public class RobotMonitorController implements Initializable {
 		if(GlobalUtil.ViewDEBUG){
 			System.out.println("onResetPressed");
 		}
-		this.model.reset();
+		try {
+			this.model.reset();
+		} catch (IOException e1) {
+			setMessage(e1.getMessage());
+		}
 		this.refleshView();
 	}
 	
@@ -557,6 +564,7 @@ public class RobotMonitorController implements Initializable {
 		this.setConnectionWidgetsDisabled(true);
 		this.startpausedButton.setDisable(false);
 		this.forwardButton.setDisable(false);
+		this.resetButton.setDisable(false);
 		this.refleshView();
 		this.setMessage("Connection Succeeded...");
 	
