@@ -13,22 +13,29 @@ public class JavaClient {
    private BufferedReader reader = null;
    private BufferedWriter writer = null;
    
-   public JavaClient(InetAddress address, int port) throws IOException
-   {
-      socket = new Socket(address, port);
-      reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-      writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+   public JavaClient(InetAddress address, int port) throws IOException{
+	   
+	   //TODO
+	   //Comment it out for testing
+//      socket = new Socket(address, port);
+//      reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+//      writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+  
+	   System.out.println("Connectio established");
    }
    
    public void send(String msg) throws IOException
     {
-        writer.write(msg, 0, msg.length());
-        writer.flush();
+	   System.out.println("Seng CMD: " + msg);
+	   //TODO
+//        writer.write(msg, 0, msg.length());
+//        writer.flush();
     }
 
    public String recv() throws IOException
-    {
-        return reader.readLine();
+    {//TODO
+     //   return reader.readLine();
+	   return "ACK";
     }
    
    public String sendForResponse(String msg) throws IOException{
@@ -37,9 +44,11 @@ public class JavaClient {
    }
    
    public void close() throws IOException{
-	   this.reader.close();
-	   this.writer.close();
-	   this.socket.close();
+	   //TODO
+	   System.out.println("Socket closing...");
+//	   this.reader.close();
+//	   this.writer.close();
+//	   this.socket.close();
    }
     /**
      * @param args the command line arguments

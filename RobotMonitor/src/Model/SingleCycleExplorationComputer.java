@@ -32,9 +32,10 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 
 	@Override
 	public Action getNextStep(Robot robot) {
+		assert(robotSurroundingStatus(robot, robot.getCurrentOrientation()) != -1);
 		if(!hasTouchedOnEdge){
 			if(!robotOnArenaEdge(robot, firstOrientation)){
-
+				
 				return moveToOrientation(robot);
 			}else{
 				hasTouchedOnEdge = true;
@@ -76,8 +77,8 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 
 	private Action moveAlongWallObstacle(Robot robot) {
 		Orientation currentOrientation = robot.getCurrentOrientation();
-		Orientation orientationOnObstacle = orientationOnDirection(currentOrientation, sideOnWallObstacle);
-		assert(robotSurroundingStatus(robot, orientationOnObstacle) == 1);
+		Orientation orientationOnWallObstacle = orientationOnDirection(currentOrientation, sideOnWallObstacle);
+		assert(robotSurroundingStatus(robot, orientationOnWallObstacle) == 1);
 		return moveTowardsDirectionInOrder(sideOnWallObstacle,
 										Direction.AHEAD, 
 										oppoDirection(sideOnWallObstacle), 
@@ -185,7 +186,7 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 			return null;
 		}
 
-		//Return the new orientation based on the orignal orientation and its relative direction
+		//Return the new orientation based on the original orientation and its relative direction
 		private static Orientation orientationOnDirection(Orientation original,Direction direction){
 			if(direction == Direction.AHEAD){
 				return original.clone();
