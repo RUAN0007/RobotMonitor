@@ -1,5 +1,7 @@
 package Model;
 
+import java.util.LinkedList;
+
 import Model.ArenaTemplate.CellState;
 import application.GlobalUtil;
 
@@ -38,8 +40,7 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 				
 				return moveToOrientation(robot);
 			}else{
-				//TODO DEBUG
-				System.out.println("Robot has touched on edge...");
+//				System.out.println("Robot has touched on edge...");
 				hasTouchedOnEdge = true;
 			}
 		}
@@ -55,8 +56,7 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 					!robotOnArenaEdge(robot, currentOrientation.relativeToRight())){
 				return Action.TURN_LEFT;
 			}
-			//TODO DEBUG
-			System.out.println("Robot has " + Direction.LEFT + " side on edge...");
+//			System.out.println("Robot has " + Direction.LEFT + " side on edge...");
 			hasRobotSideOnEdge = true;
 
 		}
@@ -64,16 +64,14 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 		if(!hasFinishedLooping){
 			if(robot.getSouthWestBlock().equals(startSouthWestBlock)){
 				if(!hasOccupiedStartBlock){
-					//TODO DEBUG
-					System.out.println("Robot has occupied start block...");
+				//	System.out.println("Robot has occupied start block...");
 					Action next = moveAlongWallObstacle(robot);
 					if(next.equals(Action.MOVE_FORWARD) || next.equals(Action.DRAW_BACK)){
 						hasOccupiedStartBlock = true;
 					}
 					return next;
 				}else{
-					//TODO DEBUG
-					System.out.println("Robot has finish looping...");
+					//System.out.println("Robot has finish looping...");
 				
 					hasFinishedLooping = true; 
 				}
@@ -85,15 +83,72 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 
 		return null;
 	}
-
+	
+	private LinkedList<Action> bufferedActions = new LinkedList<Action>();
+	private Direction tentativeTurn = Direction.NULL;
 	private Action moveAlongWallObstacle(Robot robot) {
+		
+		if(bufferedActions.size() > 0) return bufferedActions.pollFirst();
+		
+		Direction sideOppositeWallObstacle = oppoDirection(sideOnWallObstacle);
+		
 		Orientation currentOrientation = robot.getCurrentOrientation();
 		Orientation orientationOnWallObstacle = orientationOnDirection(currentOrientation, sideOnWallObstacle);
-		assert(robotSurroundingStatus(robot, orientationOnWallObstacle) == 1);
-		return moveTowardsDirectionInOrder(sideOnWallObstacle,
-										Direction.AHEAD, 
-										oppoDirection(sideOnWallObstacle), 
-										robot);
+		Orientation orientationOppositeWallObstacle = orientationOnDirection(currentOrientation,
+																			sideOppositeWallObstacle
+																	);
+		
+		if(tentativeTurn != Direction.NULL){
+			Action next = null;
+			if(robotSurroundingStatus(robot, currentOrientation) == 1){
+				next = directionToAction(oppoDirection(tentativeTurn));
+			}else if(robotSurroundingStatus(robot, currentOrientation) == 0){
+				next = Action.MOVE_FORWARD;
+			}else{
+				assert(false):"All the front cells should be explored";
+			}
+			tentativeTurn = Direction.NULL;
+			return next;
+		}
+		
+		
+		assert(robotSurroundingStatus(robot, currentOrientation) != -1):
+			"The robot's front cells must be explored.";
+		
+		if(robotSurroundingStatus(robot, orientationOnWallObstacle) == 0){
+
+			//None unexplored or obstacle cells on following side
+			//Turn to following direction and forward
+			bufferedActions.add(directionToAction(sideOnWallObstacle));
+			bufferedActions.add(Action.MOVE_FORWARD);
+		}else if(robotSurroundingStatus(robot, orientationOnWallObstacle) == -1){
+			//Just Turn to following direction
+			bufferedActions.add(directionToAction(sideOnWallObstacle));
+			tentativeTurn = sideOnWallObstacle;
+		}else if(robotSurroundingStatus(robot, currentOrientation) == 0){
+			//No obstacle ahead
+
+			bufferedActions.add(Action.MOVE_FORWARD);
+		}else if(robotSurroundingStatus(robot, orientationOppositeWallObstacle) == 0){
+			//No unexplored or  obstacle cell exists on the opposite of the following direction
+			
+			bufferedActions.add(directionToAction(sideOppositeWallObstacle));
+			bufferedActions.add(Action.MOVE_FORWARD);
+		}else if(robotSurroundingStatus(robot, orientationOppositeWallObstacle) == -1){
+			//Unexplored cell exists on the opposite of the following direction
+			tentativeTurn = sideOppositeWallObstacle;
+			bufferedActions.add(directionToAction(sideOppositeWallObstacle));
+		}else{
+			//Left,front and right side of the robot exists obstacles. 
+			//Turn the head by making a double turn
+			assert(robotSurroundingStatus(robot, currentOrientation) == 1);
+			assert(robotSurroundingStatus(robot, orientationOnWallObstacle) == 1);
+			assert(robotSurroundingStatus(robot, orientationOppositeWallObstacle) == 1);
+			bufferedActions.add(directionToAction(sideOnWallObstacle));
+			bufferedActions.add(directionToAction(sideOnWallObstacle));
+
+		}
+		return bufferedActions.pollFirst();
 	}
 
 	private Action moveToOrientation(Robot robot) {
@@ -101,7 +156,6 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 		Direction preferedDirection = getPreferedDirection();
 
 		Orientation currentOrientation = robot.getCurrentOrientation();
-		//TODO DEBUG
 //		System.out.println("Current Orientation = " + currentOrientation.toString());
 //		System.out.println("First Orientation = " + firstOrientation.toString());
 //		System.out.println("Second Orientation = " + secondOrientation.toString());

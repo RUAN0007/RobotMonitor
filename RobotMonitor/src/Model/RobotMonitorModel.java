@@ -2,17 +2,21 @@ package Model;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import Model.ArenaTemplate.CellState;
+import Model.CustomizedArena.ArenaException;
 import Model.ExplorationComputer.ExplorationEnvironment;
 
 public class RobotMonitorModel implements ExplorationEnvironment{
 	
 	public class RobotMonitorModelException extends Exception{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private int id;
 		private String msg;
 		private RobotMonitorModelException(int id, String msg) {
@@ -186,11 +190,26 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 		return true;
 	}
 	
+	//TODO 
+	
 	//TODO
 	//Delete this method after testing
 	private CellState exploreBlock(int rowID,int colID){
-		return CellState.EMPTY;
+		CustomizedArena testArena = null; 
+		try {
+			 testArena = new CustomizedArena(rowCount, colCount);
+			testArena.setDescriptor("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" + 
+									"\n" +
+									"000000000400000001C800000000000700000000800000001F80000700000000020000000000");
+		 } catch (ArenaException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return testArena.getCell(rowID, colID);
 	}
+	
+	
 	
 	public void reset() throws IOException {
 		this.explorationComputer.initExploredMap(rowCount, colCount);
