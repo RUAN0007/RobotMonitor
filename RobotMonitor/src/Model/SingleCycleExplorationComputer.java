@@ -38,6 +38,8 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 				
 				return moveToOrientation(robot);
 			}else{
+				//TODO DEBUG
+				System.out.println("Robot has touched on edge...");
 				hasTouchedOnEdge = true;
 			}
 		}
@@ -53,17 +55,24 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 					!robotOnArenaEdge(robot, currentOrientation.relativeToRight())){
 				return Action.TURN_LEFT;
 			}
-
+			//TODO DEBUG
+			System.out.println("Robot has " + Direction.LEFT + " side on edge...");
 			hasRobotSideOnEdge = true;
 
 		}
 
 		if(!hasFinishedLooping){
 			if(robot.getSouthWestBlock().equals(startSouthWestBlock)){
-				if(!hasOccupiedStartBlock){				
+				if(!hasOccupiedStartBlock){
+					//TODO DEBUG
+					System.out.println("Robot has occupied start block...");
+					
 					hasOccupiedStartBlock = true;
 					return moveAlongWallObstacle(robot);
 				}else{
+					//TODO DEBUG
+					System.out.println("Robot has finish looping...");
+				
 					hasFinishedLooping = true; 
 				}
 			}else{
@@ -86,25 +95,35 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 	}
 
 	private Action moveToOrientation(Robot robot) {
+		
 		Direction preferedDirection = getPreferedDirection();
 
 		Orientation currentOrientation = robot.getCurrentOrientation();
+		//TODO DEBUG
+//		System.out.println("Current Orientation = " + currentOrientation.toString());
+//		System.out.println("First Orientation = " + firstOrientation.toString());
+//		System.out.println("Second Orientation = " + secondOrientation.toString());
+
 		if(currentOrientation.equals(firstOrientation)){
+			
 			return moveTowardsDirectionInOrder(Direction.AHEAD,
 												preferedDirection,
 												oppoDirection(preferedDirection), 
 												robot);
 		}else if(currentOrientation.equals(secondOrientation)){
+		
 			return moveTowardsDirectionInOrder(oppoDirection(preferedDirection),
 												Direction.AHEAD,
 												preferedDirection, 
 												robot);
 		}else if(currentOrientation.toOppsite().equals(firstOrientation)){
+			
 			return moveTowardsDirectionInOrder(oppoDirection(preferedDirection),
 												Direction.AHEAD,
 												preferedDirection, 
 												robot);
 		}else if(currentOrientation.toOppsite().equals(secondOrientation)){
+			
 			return moveTowardsDirectionInOrder(preferedDirection,
 												Direction.AHEAD,
 												oppoDirection(preferedDirection), 
