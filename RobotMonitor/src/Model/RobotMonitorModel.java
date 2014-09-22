@@ -67,7 +67,7 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 		} catch (NumberFormatException | IOException e) {
 			throw new RobotMonitorModelException(1, e.getMessage());
 		}
-		
+		updateStatus();
 	}
 
 	private Map<Block, CellState> parseRpiCommand(String recv) {
@@ -192,9 +192,13 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 		return CellState.EMPTY;
 	}
 	
-	public void reset() {
+	public void reset() throws IOException {
 		this.explorationComputer.initExploredMap(rowCount, colCount);
 		this.robot = null;
+		if(this.rpi != null){
+			this.rpi.close();
+		}
+		this.rpi = null;
 		this.updateStatus();
 	}
 	

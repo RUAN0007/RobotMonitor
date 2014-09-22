@@ -441,10 +441,12 @@ public class RobotMonitorController implements Initializable {
 				actionDescription = "Mission Completed...";
 				missionCompleted = true;
 				setControlWidgetsDisabled(true);
-				setConnectionWidgetsDisabled(false);
 				this.resetButton.setDisable(false);
 			}else{
-				this.backwardButton.setDisable(false);
+				//this method is triggered by button tapping
+				if(timer == null){
+					this.backwardButton.setDisable(false);
+				}
 			}
 		} catch (IOException e) {
 			setMessage(e.getMessage());
@@ -462,6 +464,7 @@ public class RobotMonitorController implements Initializable {
 		this.backwardButton.setDisable(value);
 		this.startpausedButton.setDisable(value);
 		this.resetButton.setDisable(value);
+		this.secondsPerStepChoiceBox.setDisable(value);
 	}
 	
 	Timer timer = null;
@@ -471,13 +474,18 @@ public class RobotMonitorController implements Initializable {
 			System.out.println("onStartPausedPressed");
 		}
 		if (startpausedButton.isSelected()){
+			//TODO
 			//Start button is pressed
-			
+			this.secondsPerStepChoiceBox.setDisable(true);
+
 			this.resetButton.setDisable(true);
+
 			this.forwardButton.setDisable(true);
+
 			this.backwardButton.setDisable(true);
+
 			startpausedButton.setText("Pause");
-			
+
 			timer = new Timer();
 			double secondPerStep = Double.parseDouble(this.secondsPerStepChoiceBox.getValue());
 			long millisecondPerStep = (long)( 1000 * secondPerStep);
@@ -513,8 +521,12 @@ public class RobotMonitorController implements Initializable {
 
 	protected void onPausedPressed() {
 		timer.cancel();
+		timer = null;
 		startpausedButton.setText("Start");
+		this.secondsPerStepChoiceBox.setDisable(false);
 		this.resetButton.setDisable(false);
+		this.forwardButton.setDisable(false);
+		this.backwardButton.setDisable(false);
 	}
 	
 	@FXML
@@ -561,10 +573,13 @@ public class RobotMonitorController implements Initializable {
 			setMessage("Connection Failed: " + e.getMessage());
 			return;
 		}
+		
+		missionCompleted = false;
 		this.setConnectionWidgetsDisabled(true);
 		this.startpausedButton.setDisable(false);
 		this.forwardButton.setDisable(false);
 		this.resetButton.setDisable(false);
+		this.secondsPerStepChoiceBox.setDisable(false);
 		this.refleshView();
 		this.setMessage("Connection Succeeded...");
 	

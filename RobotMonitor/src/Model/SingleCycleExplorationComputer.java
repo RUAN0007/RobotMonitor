@@ -66,9 +66,11 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 				if(!hasOccupiedStartBlock){
 					//TODO DEBUG
 					System.out.println("Robot has occupied start block...");
-					
-					hasOccupiedStartBlock = true;
-					return moveAlongWallObstacle(robot);
+					Action next = moveAlongWallObstacle(robot);
+					if(next.equals(Action.MOVE_FORWARD) || next.equals(Action.DRAW_BACK)){
+						hasOccupiedStartBlock = true;
+					}
+					return next;
 				}else{
 					//TODO DEBUG
 					System.out.println("Robot has finish looping...");
