@@ -53,7 +53,7 @@ public abstract class ExplorationComputer {
 		return status;
 	}
 
-	public void setRobotsInitialCell(Robot robot) {
+	public boolean setRobotsInitialCell(Robot robot) {
 	
 		int span = robot.getDiameterInCellNum();
 		int southWestColID = robot.getSouthWestBlock().getColID();
@@ -62,9 +62,18 @@ public abstract class ExplorationComputer {
 	
 		for(int rowID = 0;rowID < span;rowID++){
 			for(int colID = 0;colID < span;colID++){
+				if(!withInArenaRange(rowID, colID)) return false;
 				this.exploredMap.setCellState(southWestRowID - rowID,southWestColID + colID,CellState.EMPTY); 
 			}
-		}			
+		}		
+		return true;
+	}
+	
+	private boolean withInArenaRange(int rowID,int colID){
+		
+		if(rowID < 0 || rowID >= this.exploredMap.getRowCount()) return false;
+		if(colID < 0 || colID >= this.exploredMap.getColumnCount()) return false;
+		return true;
 	}
 
 	public String getMapDescriptor() {

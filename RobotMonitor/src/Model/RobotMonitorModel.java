@@ -55,7 +55,9 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 		this.pathComputer = new MinStepTurnPathComputer(1, 1);
 		
 		this.explorationComputer = new SingleCycleExplorationComputer(rowCount, colCount, this);
-		explorationComputer.setRobotsInitialCell(robot);
+		if(!explorationComputer.setRobotsInitialCell(robot)){
+			throw new RobotMonitorModelException(2, "Can not place robot here");
+		}
 		
 		try {
 			InetAddress ip = InetAddress.getByName(ipAddress);
