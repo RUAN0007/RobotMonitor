@@ -35,7 +35,7 @@ public class JavaClient {
    public String recv() throws IOException
     {//TODO
      //   return reader.readLine();
-	   return "ACK";
+	   return "33333";
     }
    
    public String sendForResponse(String msg) throws IOException{
