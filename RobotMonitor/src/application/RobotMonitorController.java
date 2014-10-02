@@ -443,8 +443,8 @@ public class RobotMonitorController implements Initializable {
 				setControlWidgetsDisabled(true);
 				this.resetButton.setDisable(false);
 			}else{
-				//this method is triggered by button tapping
 				if(timer == null){
+					//this method is triggered by button tapping
 					this.backwardButton.setDisable(false);
 				}
 			}
