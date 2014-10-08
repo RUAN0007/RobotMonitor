@@ -60,26 +60,31 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 			hasRobotSideOnEdge = true;
 
 		}
-
-		if(!hasFinishedLooping){
-			if(robot.getSouthWestBlock().equals(startSouthWestBlock)){
-				if(!hasOccupiedStartBlock){
-				//	System.out.println("Robot has occupied start block...");
-					Action next = moveAlongWallObstacle(robot);
-					if(next.equals(Action.MOVE_FORWARD) || next.equals(Action.DRAW_BACK)){
-						hasOccupiedStartBlock = true;
-					}
-					return next;
-				}else{
-					//System.out.println("Robot has finish looping...");
-				
-					hasFinishedLooping = true; 
-				}
-			}else{
-				return moveAlongWallObstacle(robot);
-			}
 		
+		if(!robot.getSouthWestBlock().equals(startSouthWestBlock)){
+			return moveAlongWallObstacle(robot);
 		}
+		
+		
+//		if(!hasFinishedLooping){
+//			if(robot.getSouthWestBlock().equals(startSouthWestBlock)){
+//				if(!hasOccupiedStartBlock){
+//				//	System.out.println("Robot has occupied start block...");
+//					Action next = moveAlongWallObstacle(robot);
+//					if(next.equals(Action.MOVE_FORWARD) || next.equals(Action.DRAW_BACK)){
+//						hasOccupiedStartBlock = true;
+//					}
+//					return next;
+//				}else{
+//					//System.out.println("Robot has finish looping...");
+//				
+//					hasFinishedLooping = true; 
+//				}
+//			}else{
+//				return moveAlongWallObstacle(robot);
+//			}
+//		
+//		}
 
 		return null;
 	}
