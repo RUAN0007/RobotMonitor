@@ -25,8 +25,8 @@ public class JavaClient {
    public void send(String msg) throws IOException
     {
 	   System.out.println("Seng CMD: " + msg);
-//        writer.write(msg, 0, msg.length());
-//        writer.flush();
+        writer.write(msg, 0, msg.length());
+        writer.flush();
     }
 
    public String recv() throws IOException
