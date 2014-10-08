@@ -9,8 +9,8 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 	////////////////////////////
 	//Parameters
 	private Block startSouthWestBlock = GlobalUtil.startSouthWestBlock;
-	private Orientation firstOrientation = Orientation.SOUTH;
-	private Orientation secondOrientation = Orientation.WEST;
+	private Orientation firstOrientation = Orientation.NORTH;
+	private Orientation secondOrientation = Orientation.EAST;
 	private Direction sideOnWallObstacle = Direction.LEFT;
 	//Default action when the left, front and right side of the robot
 	//is obstacled.
