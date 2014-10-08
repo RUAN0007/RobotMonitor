@@ -19,7 +19,7 @@ public class JavaClient {
       reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
       writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 //  
-	   System.out.println("Connectio established");
+	   System.out.println("Connection established");
    }
    
    public void send(String msg) throws IOException
