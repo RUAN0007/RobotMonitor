@@ -61,8 +61,13 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 
 		}
 		
-		if(!robot.getSouthWestBlock().equals(startSouthWestBlock)){
+		if(robot.getSouthWestBlock().equals(startSouthWestBlock)){
+			hasFinishedLooping = true;
+		}
+		if(!hasFinishedLooping){
 			return moveAlongWallObstacle(robot);
+		}else{
+			return null;
 		}
 		
 		
@@ -86,7 +91,6 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 //		
 //		}
 
-		return null;
 	}
 	
 	private LinkedList<Action> bufferedActions = new LinkedList<Action>();
