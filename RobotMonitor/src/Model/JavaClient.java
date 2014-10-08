@@ -15,24 +15,25 @@ public class JavaClient {
    
    public JavaClient(InetAddress address, int port) throws IOException{
 	   
-
       socket = new Socket(address, port);
       reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
       writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-  
+//  
 	   System.out.println("Connectio established");
    }
    
    public void send(String msg) throws IOException
     {
 	   System.out.println("Seng CMD: " + msg);
-        writer.write(msg, 0, msg.length());
-        writer.flush();
+//        writer.write(msg, 0, msg.length());
+//        writer.flush();
     }
 
    public String recv() throws IOException
     {
-        String received =  reader.readLine();
+	   
+	    String received =  reader.readLine();
+	   
  	   System.out.println("Receive CMD: " + received);
  	   return received;
     }
