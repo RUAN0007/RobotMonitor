@@ -116,7 +116,7 @@
             <Font size="14.0" />
          </font>
       </Label>
-      <TextField fx:id="ipTextField" layoutX="561.0" layoutY="108.0" prefHeight="26.0" prefWidth="76.0" text="127.0.0.1" />
+      <TextField fx:id="ipTextField" layoutX="561.0" layoutY="108.0" prefHeight="26.0" prefWidth="76.0" text="192.168.6.1" />
       <Button fx:id="connectionButton" layoutX="704.0" layoutY="108.0" mnemonicParsing="false" onAction="#onConnectPressed" prefHeight="26.0" prefWidth="76.0" text="Connect" />
       <Label layoutX="533.0" layoutY="42.0" text="SouthWest Block:" />
       <Label layoutX="643.0" layoutY="42.0" text="Row" />
@@ -125,7 +125,7 @@
       <ChoiceBox fx:id="initOrientationChoiceBox" layoutX="660.0" layoutY="69.0" prefHeight="26.0" prefWidth="117.0" />
       <ChoiceBox fx:id="initRowChoiceBox" layoutX="675.0" layoutY="37.0" prefHeight="26.0" prefWidth="24.0" />
       <ChoiceBox fx:id="initColChoiceBox" layoutX="742.0" layoutY="37.0" prefHeight="26.0" prefWidth="24.0" />
-      <TextField fx:id="portTextField" layoutX="649.0" layoutY="108.0" prefHeight="26.0" prefWidth="50.0" text="66667" />
+      <TextField fx:id="portTextField" layoutX="649.0" layoutY="108.0" prefHeight="26.0" prefWidth="50.0" text="6666" />
       <Label alignment="CENTER" layoutX="626.0" layoutY="98.0" prefHeight="45.0" prefWidth="35.0" text=":" textAlignment="CENTER" wrapText="true">
          <font>
             <Font size="14.0" />
