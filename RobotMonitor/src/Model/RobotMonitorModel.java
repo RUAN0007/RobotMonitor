@@ -296,8 +296,7 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 	}
 
 
-	//TODO
-	//Delete this method after testing
+	//This method after testing
 	private CellState exploreBlock(int rowID,int colID){
 		CustomizedArena testArena = null; 
 		try {
