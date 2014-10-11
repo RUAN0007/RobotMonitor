@@ -24,17 +24,17 @@ public class JavaClient {
    
    public void send(String msg) throws IOException
     {
-	   System.out.println("Seng CMD: " + msg);
+	   System.out.println("Send CMD: " + msg);
         writer.write(msg, 0, msg.length());
         writer.flush();
     }
 
    public String recv() throws IOException
     {
-	   
+	   System.out.print("Receiving CMD: " );
 	    String received =  reader.readLine();
 	   
- 	   System.out.println("Receive CMD: " + received);
+ 	   System.out.println(" " + received);
  	   return received;
     }
    
