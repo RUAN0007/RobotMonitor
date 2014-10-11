@@ -32,7 +32,8 @@ public class HalfCycleExplorationComputer extends ExplorationComputer {
 	private boolean hasRobotSideOnEdge = false;
 	private boolean hasOccupiedStartBlock = false;
 	private boolean hasFinishedLooping = false;
-
+	private boolean hasOnStartOrientation = false;
+	
 	@Override
 	public Action getNextStep(Robot robot) {
 		assert(robotSurroundingStatus(robot, robot.getCurrentOrientation()) != -1);
@@ -67,6 +68,14 @@ public class HalfCycleExplorationComputer extends ExplorationComputer {
 		}
 		if(!hasFinishedLooping){
 			return moveAlongWallObstacle(robot);
+		}
+		
+		if(robot.getCurrentOrientation().equals(orientationBeforeTraveling)){
+			hasOnStartOrientation = true;
+		}	
+			
+		if(!hasOnStartOrientation){
+			return Action.TURN_RIGHT;
 		}else{
 			return null;
 		}
