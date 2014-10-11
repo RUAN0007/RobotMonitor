@@ -13,6 +13,8 @@ public class JavaClient {
    private BufferedReader reader = null;
    private BufferedWriter writer = null;
    
+   public JavaClient(){};
+   
    public JavaClient(InetAddress address, int port) throws IOException{
 	   
       socket = new Socket(address, port);
