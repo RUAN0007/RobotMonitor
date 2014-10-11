@@ -5,19 +5,20 @@ import java.util.LinkedList;
 import Model.ArenaTemplate.CellState;
 import application.GlobalUtil;
 
-public class SingleCycleExplorationComputer extends ExplorationComputer {
+public class HalfCycleExplorationComputer extends ExplorationComputer {
 	////////////////////////////
 	//Parameters
 	private Block startSouthWestBlock = GlobalUtil.startSouthWestBlock;
 	private Orientation firstOrientation = Orientation.NORTH;
 	private Orientation secondOrientation = Orientation.EAST;
 	private Direction sideOnWallObstacle = Direction.LEFT;
+	private Orientation orientationBeforeTraveling = Orientation.NORTH;
 	//Default action when the left, front and right side of the robot
 	//is obstacled.
 	private Action defaultAction = Action.TURN_LEFT; 
 	///////////////////////////////////
 
-	public SingleCycleExplorationComputer(int rowCount, int colCount,
+	public HalfCycleExplorationComputer(int rowCount, int colCount,
 			ExplorationEnvironment env) {
 		super(rowCount, colCount, env);
 		assert(!firstOrientation.toOppsite().equals(secondOrientation)):
