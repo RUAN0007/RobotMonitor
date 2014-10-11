@@ -45,6 +45,9 @@ public class RobotMonitorController implements Initializable {
 	private int rowCount = GlobalUtil.rowCount;
 	private int colCount = GlobalUtil.colCount;
 	@FXML
+	Label descriptorLabel;
+	
+	@FXML
 	GridPane arena;
 
 	@FXML
@@ -266,6 +269,7 @@ public class RobotMonitorController implements Initializable {
 				
 				this.stepCountLabel.setText("" + this.model.getCurrentStepCount());
 				this.turnCountLabel.setText("" + this.model.getCurrentTurnCount());
+				this.descriptorLabel.setText(this.model.getExploredDescriptor());
 				double coverage = this.model.getExploredCoverage();
 				this.coverageLabel.setText(roundToDigitsAfterDecimal(coverage,2));
 	}
