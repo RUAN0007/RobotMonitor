@@ -57,7 +57,7 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 		this.goalSouthWestBlock = goalSouthWestBlock.clone();
 
 	//	this.pathComputer = new MinStepTurnPathComputer(1, 1);
-		this.pathComputer = new CloseWallPathComputer(Direction.RIGHT);
+		this.pathComputer = new CloseWallPathComputer(Direction.LEFT);
 		this.explorationComputer = new HalfCycleExplorationComputer(rowCount, colCount, this);
 		if(!explorationComputer.setRobotsInitialCell(robot)){
 			throw new RobotMonitorModelException(2, "Can not place robot here");

@@ -9,9 +9,9 @@ public class HalfCycleExplorationComputer extends ExplorationComputer {
 	////////////////////////////
 	//Parameters
 	private Block startSouthWestBlock = GlobalUtil.startSouthWestBlock;
-	private Orientation firstOrientation = Orientation.NORTH;
-	private Orientation secondOrientation = Orientation.EAST;
-	private Direction sideOnWallObstacle = Direction.LEFT;
+	private Orientation firstOrientation = Orientation.EAST;
+	private Orientation secondOrientation = Orientation.NORTH;
+	private Direction sideOnWallObstacle = Direction.RIGHT;
 	private Orientation orientationBeforeTraveling = Orientation.NORTH;
 	//Default action when the left, front and right side of the robot
 	//is obstacled.
