@@ -140,7 +140,8 @@ public class RobotMonitorController implements Initializable {
 		initOrientationChoiceBox.getItems().add(Orientation.EAST.toString());
 		initOrientationChoiceBox.getItems().add(Orientation.SOUTH.toString());
 		initOrientationChoiceBox.getItems().add(Orientation.WEST.toString());
-		initOrientationChoiceBox.setValue(Orientation.EAST.toString());
+	//TODO SET Initial orientation
+		initOrientationChoiceBox.setValue(Orientation.WEST.toString());
 	}
 	
 	private void setConnectionWidgetsDisabled(boolean value){

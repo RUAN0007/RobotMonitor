@@ -36,7 +36,8 @@ public class FullCornerExplorationComputer extends ExplorationComputer {
 			
 				return moveToOrientation(robot, Orientation.WEST, Orientation.SOUTH);
 			}else{
-				this.hasReachedGoal = true;
+				System.out.println("Has Reached Start...");
+				this.hasReachedStart = true;
 			}
 		}
 		
@@ -44,6 +45,7 @@ public class FullCornerExplorationComputer extends ExplorationComputer {
 			if(!robotOnArenaEdge(robot, Orientation.EAST)){
 				return moveToOrientation(robot, Orientation.SOUTH, Orientation.EAST);
 			}else{
+				System.out.println("Has Reached SouthEastCorner...");
 				this.hasReachedSouthEastCorner = true;
 			}
 		}

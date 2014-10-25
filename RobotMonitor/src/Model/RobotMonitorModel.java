@@ -58,14 +58,18 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 
 		this.pathComputer = new MinStepTurnPathComputer(1, 1);
 	//	this.pathComputer = new CloseWallPathComputer(Direction.LEFT);
-		this.explorationComputer = new HalfCycleExplorationComputer(rowCount, colCount, this);
+		
+	//	this.explorationComputer = new HalfCycleExplorationComputer(rowCount, colCount, this);
+		this.explorationComputer = new FullCornerExplorationComputer(rowCount, colCount, this);
 		if(!explorationComputer.setRobotsInitialCell(robot)){
 			throw new RobotMonitorModelException(2, "Can not place robot here");
 		}
 
 		try {
 			InetAddress ip = InetAddress.getByName(ipAddress);
-			this.rpi = new JavaClient(ip, Integer.parseInt(portStr));
+		//TODO Testing
+			//	this.rpi = new JavaClient(ip, Integer.parseInt(portStr));
+			this.rpi = new FakeJavaClient(ip, Integer.parseInt(portStr));
 			this.exploredCells = this.parseRpiCommand(this.rpi.recv());
 			this.explorationComputer.explore();
 		} catch (NumberFormatException | IOException e) {
