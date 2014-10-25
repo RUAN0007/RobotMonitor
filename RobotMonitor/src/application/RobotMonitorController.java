@@ -128,19 +128,19 @@ public class RobotMonitorController implements Initializable {
 		for(int rowID = 1;rowID <= this.rowCount;rowID++){
 			initRowChoiceBox.getItems().add("" + rowID);
 		}
-		initRowChoiceBox.setValue("10");
+		initRowChoiceBox.setValue("12");
 		
 		for(int colID = 1;colID <= this.colCount;colID++){
 			initColChoiceBox.getItems().add("" + colID);
 		}
-		initColChoiceBox.setValue("6");
+		initColChoiceBox.setValue("7");
 		
 		
 		initOrientationChoiceBox.getItems().add(Orientation.NORTH.toString());
 		initOrientationChoiceBox.getItems().add(Orientation.EAST.toString());
 		initOrientationChoiceBox.getItems().add(Orientation.SOUTH.toString());
 		initOrientationChoiceBox.getItems().add(Orientation.WEST.toString());
-		initOrientationChoiceBox.setValue(Orientation.NORTH.toString());
+		initOrientationChoiceBox.setValue(Orientation.EAST.toString());
 	}
 	
 	private void setConnectionWidgetsDisabled(boolean value){
@@ -160,11 +160,12 @@ public class RobotMonitorController implements Initializable {
 		backwardButton.setDisable(true);
 		resetButton.setDisable(true);
 		secondsPerStepChoiceBox.setDisable(true);
-
+		
+		secondsPerStepChoiceBox.getItems().add("0.1");
 		secondsPerStepChoiceBox.getItems().add("0.5");
 		secondsPerStepChoiceBox.getItems().add("1");
 		secondsPerStepChoiceBox.getItems().add("2");
-		secondsPerStepChoiceBox.setValue("1");
+		secondsPerStepChoiceBox.setValue("0.5");
 	}
 
 	private void addBlocks(int rowCount,int columnCount,int indexFont) {

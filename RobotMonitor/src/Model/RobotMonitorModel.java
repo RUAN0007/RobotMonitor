@@ -56,8 +56,8 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 		this.startSouthWestBlock = startSouthWestBlock.clone();
 		this.goalSouthWestBlock = goalSouthWestBlock.clone();
 
-	//	this.pathComputer = new MinStepTurnPathComputer(1, 1);
-		this.pathComputer = new CloseWallPathComputer(Direction.LEFT);
+		this.pathComputer = new MinStepTurnPathComputer(1, 1);
+	//	this.pathComputer = new CloseWallPathComputer(Direction.LEFT);
 		this.explorationComputer = new HalfCycleExplorationComputer(rowCount, colCount, this);
 		if(!explorationComputer.setRobotsInitialCell(robot)){
 			throw new RobotMonitorModelException(2, "Can not place robot here");
@@ -65,8 +65,7 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 
 		try {
 			InetAddress ip = InetAddress.getByName(ipAddress);
-			//TODO Testing
-			this.rpi = new FakeJavaClient(ip, Integer.parseInt(portStr));
+			this.rpi = new JavaClient(ip, Integer.parseInt(portStr));
 			this.exploredCells = this.parseRpiCommand(this.rpi.recv());
 			this.explorationComputer.explore();
 		} catch (NumberFormatException | IOException e) {
@@ -89,27 +88,27 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 		assert(recv.length() == 5);
 		String firstDigit =  recv.substring(0, 1); 
 		Orientation robotLeftSideOrientation = this.robot.getCurrentOrientation().relativeToLeft();
-		Map<Block,CellState> middleLeftExploredResults = addExploredBlocks(robotLeftSideOrientation,MIDDLE,firstDigit);
+		Map<Block,CellState> middleLeftExploredResults = addExploredBlocks(robotLeftSideOrientation,MIDDLE,firstDigit,true);
 		results.putAll(middleLeftExploredResults);
 
 		Orientation robotCurrentOrientation = this.robot.getCurrentOrientation().clone();
 
 		String secondDigit = recv.substring(1, 2);
-		Map<Block,CellState> leftFrontExploredResults = addExploredBlocks(robotCurrentOrientation,LEFT_SIDE,secondDigit);
+		Map<Block,CellState> leftFrontExploredResults = addExploredBlocks(robotCurrentOrientation,LEFT_SIDE,secondDigit,false);
 		results.putAll(leftFrontExploredResults);
 
 		String thirdDigit = recv.substring(2, 3);
-		Map<Block,CellState> middleFrontExploredResults = addExploredBlocks(robotCurrentOrientation,MIDDLE,thirdDigit);
+		Map<Block,CellState> middleFrontExploredResults = addExploredBlocks(robotCurrentOrientation,MIDDLE,thirdDigit,false);
 		results.putAll(middleFrontExploredResults);
 
 		String fourthDigit = recv.substring(3, 4);
-		Map<Block,CellState> rightFrontExploredResults = addExploredBlocks(robotCurrentOrientation,RIGHT_SIDE,fourthDigit);
+		Map<Block,CellState> rightFrontExploredResults = addExploredBlocks(robotCurrentOrientation,RIGHT_SIDE,fourthDigit,false);
 		results.putAll(rightFrontExploredResults);
 
 
 		Orientation robotRightSideOrientation = this.robot.getCurrentOrientation().relativeToRight();
 		String fifthDigit = recv.substring(4, 5);
-		Map<Block,CellState> middleRightExploredResults = addExploredBlocks(robotRightSideOrientation,MIDDLE,fifthDigit);
+		Map<Block,CellState> middleRightExploredResults = addExploredBlocks(robotRightSideOrientation,MIDDLE,fifthDigit,true);
 		results.putAll(middleRightExploredResults);
 
 		///////////////////////////////////////////////////
@@ -118,24 +117,57 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 
 	private Map<Block, CellState> addExploredBlocks(
 			Orientation orientation, int side,
-			String value) {
+			String value
+			,boolean sideSensor){
 		int distanceRange = Integer.parseInt(value);
 		assert(1 <= distanceRange && distanceRange <= 4);
 
 		Map<Block,CellState> results = new HashMap<>();
 		int distance;
-		for( distance = 1;distance < distanceRange;distance++){
-			Block targetBlock = getBlockRelativeToRobotSide(orientation, side, distance);
-			if(withInArenaRange(targetBlock.getRowID(), targetBlock.getColID())){
-				results.put(targetBlock, CellState.EMPTY);
+		
+		
+		if(!sideSensor){
+			for( distance = 1;distance < distanceRange;distance++){
+				Block targetBlock = getBlockRelativeToRobotSide(orientation, side, distance);
+				if(withInArenaRange(targetBlock.getRowID(), targetBlock.getColID())){
+					results.put(targetBlock, CellState.EMPTY);
+				}
 			}
-		}
-		if(distance < 4){
-			Block targetBlock = getBlockRelativeToRobotSide(orientation, side, distance);
-			if(withInArenaRange(targetBlock.getRowID(), targetBlock.getColID())){
-				results.put(targetBlock, CellState.OBSTACLE);
+			if(distance < 4){
+				Block targetBlock = getBlockRelativeToRobotSide(orientation, side, distance);
+				if(withInArenaRange(targetBlock.getRowID(), targetBlock.getColID())){
+					results.put(targetBlock, CellState.OBSTACLE);
+				}
 			}
+		}else{
+			if(distanceRange == 4){
+				Block targetBlock = getBlockRelativeToRobotSide(orientation, side, 1);
+				if(withInArenaRange(targetBlock.getRowID(), targetBlock.getColID())){
+					results.put(targetBlock, CellState.EMPTY);
+				}
+				targetBlock = getBlockRelativeToRobotSide(orientation, side, 2);
+				if(withInArenaRange(targetBlock.getRowID(), targetBlock.getColID())){
+					results.put(targetBlock, CellState.EMPTY);
+				}
+			}else if(distanceRange == 2){
+				Block targetBlock = getBlockRelativeToRobotSide(orientation, side, 1);
+				if(withInArenaRange(targetBlock.getRowID(), targetBlock.getColID())){
+					results.put(targetBlock, CellState.EMPTY);
+				}
+				targetBlock = getBlockRelativeToRobotSide(orientation, side, 2);
+				if(withInArenaRange(targetBlock.getRowID(), targetBlock.getColID())){
+					results.put(targetBlock, CellState.OBSTACLE);
+				}
+			}else if(distanceRange == 1){
+				Block targetBlock = getBlockRelativeToRobotSide(orientation, side, 1);
+				if(withInArenaRange(targetBlock.getRowID(), targetBlock.getColID())){
+					results.put(targetBlock, CellState.OBSTACLE);
+				}
+			}
+			
 		}
+		
+		
 		return results;
 	}
 
@@ -364,8 +396,6 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 		}
 	}
 
-
-
 	private void updateForRobot(Cell[][] mapStatus) {
 		int robotDiameterInCellNum = this.robot.getDiameterInCellNum();
 		int cellRowIndex, cellColIndex;
@@ -373,8 +403,8 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 			cellRowIndex = this.robot.getSouthWestBlock().getRowID() - rowOffset;
 			for(int colOffset = 0;colOffset < robotDiameterInCellNum;colOffset++){
 				cellColIndex = this.robot.getSouthWestBlock().getColID() + colOffset;
-
-				assert(mapStatus[cellRowIndex][cellColIndex] != Cell.OBSTACLE);
+//TODO Can Cross over
+				//assert(mapStatus[cellRowIndex][cellColIndex] != Cell.OBSTACLE);
 				mapStatus[cellRowIndex][cellColIndex] = Cell.ROBOT;		
 			}
 		}
@@ -469,21 +499,26 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 				//Exploration has finished
 				if(!finishExploration){
 					finishExploration = true;
-					String response = this.sendRpiForResponse(FINISH);
-					assert(response.equals(ACK)):"The ACK is wrong";
 
 					//Compute round trip fastest path from start to goal
 //						ArrayList<Action> roundTripActionFastestPath 
 //					= getRoundTripFastestPath(this.robot,
 //							this.explorationComputer.getExploredArena());
+					
 					ArrayList<Action> oneWayTrip = this.pathComputer.computeForFastestPath(
 							this.explorationComputer.getExploredArena(), 
 							robot, 
 							this.goalSouthWestBlock.getRowID(), 
 							this.goalSouthWestBlock.getColID());
+					
+					String response = this.sendRpiForResponse(FINISH);
+					assert(response.equals(ACK)):"The ACK is wrong";
+
 					this.actions.addAll(oneWayTrip);
 					return "Exploration Finished";
 				}else{
+					//Traveling fastest path is also finished...
+					
 					if(this.rpi != null){
 						this.rpi.close();
 						this.rpi = null;
