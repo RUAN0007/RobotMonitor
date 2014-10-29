@@ -1,6 +1,8 @@
 package Model;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import Model.ArenaTemplate.CellState;
 import application.GlobalUtil;
@@ -86,6 +88,9 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 	
 	private LinkedList<Action> bufferedActions = new LinkedList<Action>();
 	private Direction tentativeTurn = Direction.NULL;
+	private List<Direction> preDirections = new ArrayList<Direction>();
+	private static boolean isLost = false;
+	
 	private Action moveAlongWallObstacle(Robot robot) {
 		
 		if(bufferedActions.size() > 0) return bufferedActions.pollFirst();
@@ -96,7 +101,45 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 		Orientation orientationOnWallObstacle = orientationOnDirection(currentOrientation, sideOnWallObstacle);
 		Orientation orientationOppositeWallObstacle = orientationOnDirection(currentOrientation,
 																			sideOppositeWallObstacle
-																	);
+															);
+		
+		
+		
+		if(!isLost && isLooping()){
+			isLost = true;
+		}
+		
+		if(isLost){
+			
+			//find the nearest edge
+			Orientation nearestEdge = getNearestEdge(robot);
+			Orientation nextNearestEdge = getNextNearestEdge(robot,nearestEdge);
+			
+			if(!robotOnArenaEdge(robot, nextNearestEdge)){
+				//Move towards nearest edge	
+				firstOrientation = nearestEdge;
+				secondOrientation = nextNearestEdge;
+				return moveToOrientation(robot);
+			}else{
+				
+				if(robotSurroundingStatus(robot, orientationOnWallObstacle) != 1){
+					//Obstacle not on sideOnWallObstacle 
+
+					//Make the turn to make the obstacle on the sideOnObstacle
+					return Action.TURN_LEFT;
+				}else{
+					isLost = false;
+					preDirections.clear();
+					//Go on the normal flow
+				}
+			}
+		}
+		
+		
+		
+		
+		
+		
 		
 		if(tentativeTurn != Direction.NULL){
 			Action next = null;
@@ -104,6 +147,7 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 				next = directionToAction(oppoDirection(tentativeTurn));
 			}else if(robotSurroundingStatus(robot, currentOrientation) == 0){
 				next = Action.MOVE_FORWARD;
+				this.preDirections.add(tentativeTurn);
 			}else{
 				assert(false):"All the front cells should be explored";
 			}
@@ -121,19 +165,23 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 			//Turn to following direction and forward
 			bufferedActions.add(directionToAction(sideOnWallObstacle));
 			bufferedActions.add(Action.MOVE_FORWARD);
+			this.preDirections.add(sideOnWallObstacle);
 		}else if(robotSurroundingStatus(robot, orientationOnWallObstacle) == -1){
 			//Just Turn to following direction
 			bufferedActions.add(directionToAction(sideOnWallObstacle));
 			tentativeTurn = sideOnWallObstacle;
 		}else if(robotSurroundingStatus(robot, currentOrientation) == 0){
 			//No obstacle ahead
-
 			bufferedActions.add(Action.MOVE_FORWARD);
+			this.preDirections.add(Direction.AHEAD);
+
 		}else if(robotSurroundingStatus(robot, orientationOppositeWallObstacle) == 0){
 			//No unexplored or  obstacle cell exists on the opposite of the following direction
 			
 			bufferedActions.add(directionToAction(sideOppositeWallObstacle));
 			bufferedActions.add(Action.MOVE_FORWARD);
+			this.preDirections.add(sideOppositeWallObstacle);
+
 		}else if(robotSurroundingStatus(robot, orientationOppositeWallObstacle) == -1){
 			//Unexplored cell exists on the opposite of the following direction
 			tentativeTurn = sideOppositeWallObstacle;
@@ -146,10 +194,124 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 			assert(robotSurroundingStatus(robot, orientationOppositeWallObstacle) == 1);
 			bufferedActions.add(directionToAction(sideOnWallObstacle));
 			bufferedActions.add(directionToAction(sideOnWallObstacle));
+			
+			this.preDirections.add(sideOnWallObstacle);
+			this.preDirections.add(sideOnWallObstacle);
 
 		}
 		return bufferedActions.pollFirst();
 	}
+	
+	private Orientation getNearestEdge(Robot robot) {
+		
+		
+		int distToNorth = distanceToEdge(robot, Orientation.NORTH);
+		int min = distToNorth;
+		Orientation nearestEdge = Orientation.NORTH;
+		
+		int distToEast = distanceToEdge(robot, Orientation.EAST);
+		if(min > distToEast){
+			min = distToEast;
+			nearestEdge = Orientation.EAST;
+		}
+		
+		int distToSouth = distanceToEdge(robot, Orientation.SOUTH);
+		if(min > distToSouth){
+			min = distToSouth;
+			nearestEdge = Orientation.SOUTH;
+		}
+		
+		int distToWest = distanceToEdge(robot, Orientation.WEST);
+		if(min > distToWest){
+			min = distToWest;
+			nearestEdge = Orientation.WEST;
+		}
+		return nearestEdge;
+	}
+	
+	private Orientation getNextNearestEdge(Robot robot,Orientation nearestOrientation){
+		int min = 1000;
+		Orientation nextNearestEdge = null;
+		
+		if(nearestOrientation.equals(Orientation.NORTH) || nearestOrientation.equals(Orientation.SOUTH)){
+			int distToEast = distanceToEdge(robot, Orientation.EAST);
+			if(min > distToEast){
+				min = distToEast;
+				nextNearestEdge = Orientation.EAST;
+			}
+			
+			int distToWest = distanceToEdge(robot, Orientation.WEST);
+			if(min > distToWest){
+				min = distToWest;
+				nextNearestEdge = Orientation.WEST;
+			}
+		}else{
+			int distToNorth = distanceToEdge(robot, Orientation.NORTH);
+			if(min > distToNorth){
+				min = distToNorth;
+				nextNearestEdge = Orientation.NORTH;
+			}
+			
+			int distToSouth = distanceToEdge(robot, Orientation.SOUTH);
+			if(min > distToSouth){
+				min = distToSouth;
+				nextNearestEdge = Orientation.SOUTH;
+			}
+		}
+		return nextNearestEdge;
+	}
+	
+	
+	private int distanceToEdge(Robot robot,Orientation orientation){
+		int southWestBlockRow = robot.getSouthWestBlock().getRowID();
+		int southWestBlockCol = robot.getSouthWestBlock().getColID();
+		int robotDiameter = robot.getDiameterInCellNum();
+		
+		int rowCount = this.getExploredArena().getRowCount();
+		int colCount = this.getExploredArena().getColumnCount();
+		
+		if(orientation.equals(Orientation.NORTH)){
+			return southWestBlockRow - robotDiameter + 1;
+		}
+		if(orientation.equals(Orientation.EAST)){
+			return colCount - southWestBlockCol - robotDiameter;
+		}
+		if(orientation.equals(Orientation.SOUTH)){
+			return rowCount - southWestBlockRow - 1;
+		}
+		if(orientation.equals(Orientation.WEST)){
+			return colCount;
+		}
+		assert(false):"Should not reach here";
+		return -1;
+	}
+	
+	
+	/**
+	 * If the previous four actions are the same turn, then the robot is in empty looping
+	 * @param robot
+	 * @return
+	 */
+	private boolean isLooping() {
+		int size = this.preDirections.size();
+		if(size < 4){
+			return false;
+		}
+		
+		for(int id = 3;id >= 1;id++){
+			if(this.preDirections.get(size - id - 1).equals(Direction.AHEAD)){
+				return false;
+			}
+			if(!this.preDirections.get(size - id).equals(this.preDirections.get(size - id - 1))){
+				return false;
+			}
+			
+		}
+		
+		return true;
+	}
+
+
 
 	private Action moveToOrientation(Robot robot) {
 		
