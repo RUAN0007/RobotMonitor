@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="905.0" prefWidth="791.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.RobotMonitorController">
+<AnchorPane onKeyPressed="#onKeyTouched" prefHeight="905.0" prefWidth="791.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.RobotMonitorController">
    <children>
       <MenuBar layoutY="1.0" prefHeight="29.0" prefWidth="67.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="724.0" AnchorPane.topAnchor="0.0">
         <menus>

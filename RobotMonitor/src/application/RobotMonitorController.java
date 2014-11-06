@@ -21,6 +21,8 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -152,7 +154,25 @@ public class RobotMonitorController implements Initializable {
 		this.portTextField.setEditable(!value);
 		this.connectionButton.setDisable(value);
 
-
+		
+	}
+	
+	@FXML
+	public void onKeyTouched(KeyEvent keyEvent){
+		System.out.println("OnKeyTouched");
+		if(keyEvent.getCode()==KeyCode.UP){
+			this.model.roamRobot("N");
+		}
+		if(keyEvent.getCode()==KeyCode.LEFT){
+			this.model.roamRobot("W");
+		}
+		if(keyEvent.getCode()==KeyCode.DOWN){
+			this.model.roamRobot("S");
+		}
+		if(keyEvent.getCode()==KeyCode.RIGHT){
+			this.model.roamRobot("E");
+		}
+		this.refleshView();
 	}
 
 	private void initControlWidgets() {

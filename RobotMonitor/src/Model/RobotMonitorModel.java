@@ -55,7 +55,7 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 		this.robot = robot;
 		this.startSouthWestBlock = startSouthWestBlock.clone();
 		this.goalSouthWestBlock = goalSouthWestBlock.clone();
-
+		//TODO
 		//Change pathcomputer
 		this.pathComputer = new MinStepTurnPathComputer(1, 1);
 	//	this.pathComputer = new CloseWallPathComputer(Direction.LEFT);
@@ -64,14 +64,20 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 	//	this.explorationComputer = new FullCornerExplorationComputer(rowCount, colCount, this);
 		this.explorationComputer = new SingleCycleExplorationComputer(rowCount, colCount, this);
 
+		if(this.robot.getCurrentOrientation().equals(Orientation.WEST)){
+			this.explorationComputer = new SingleCycleExplorationComputer(rowCount, colCount, this);
+		}else{
+			this.explorationComputer = new HalfCycleExplorationComputer(rowCount, colCount, this);
+
+		}
+		
 		if(!explorationComputer.setRobotsInitialCell(robot)){
 			throw new RobotMonitorModelException(2, "Can not place robot here");
 		}
 
 		try {
 			InetAddress ip = InetAddress.getByName(ipAddress);
-		//TODO Testing
-			//	this.rpi = new JavaClient(ip, Integer.parseInt(portStr));
+			//this.rpi = new JavaClient(ip, Integer.parseInt(portStr));
 			this.rpi = new FakeJavaClient(ip, Integer.parseInt(portStr));
 			this.exploredCells = this.parseRpiCommand(this.rpi.recv());
 			this.explorationComputer.explore();
@@ -615,5 +621,21 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 
 	public double getExploredCoverage(){
 		return this.explorationComputer.getCoverage();
+	}
+	
+	public void roamRobot(String ori){
+		if(ori.equals("N")){
+			this.robot.roamNorth();
+		}
+		if(ori.equals("S")){
+			this.robot.roamSouth();
+		}
+		if(ori.equals("E")){
+			this.robot.roamEast();
+		}
+		if(ori.equals("W")){
+			this.robot.roamWest();
+		}
+		this.updateStatus();
 	}
 }
