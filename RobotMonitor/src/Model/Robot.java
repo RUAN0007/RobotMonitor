@@ -81,8 +81,33 @@ public class Robot {
 
 		}
 		this.currentOrientation = act.orientationAfterAction(this.currentOrientation);
-
 	}
 	 
+	public void roamNorth(){
+		int originalRow = this.southWestBlock.getRowID();
+		int originalCol = this.southWestBlock.getColID();
+		
+		this.setSouthWestBlock(new Block(originalRow - 1, originalCol));
+	}
 	
+	public void roamSouth(){
+		int originalRow = this.southWestBlock.getRowID();
+		int originalCol = this.southWestBlock.getColID();
+		
+		this.setSouthWestBlock(new Block(originalRow + 1, originalCol));
+	}
+	
+	public void roamWest(){
+		int originalRow = this.southWestBlock.getRowID();
+		int originalCol = this.southWestBlock.getColID();
+		
+		this.setSouthWestBlock(new Block(originalRow, originalCol - 1));
+	}
+	
+	public void roamEast(){
+		int originalRow = this.southWestBlock.getRowID();
+		int originalCol = this.southWestBlock.getColID();
+		
+		this.setSouthWestBlock(new Block(originalRow, originalCol + 1));
+	}
 }
