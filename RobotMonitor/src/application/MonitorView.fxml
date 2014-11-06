@@ -19,7 +19,7 @@
           </Menu>
         </menus>
       </MenuBar>
-      <GridPane fx:id="arena" layoutX="68.0" layoutY="29.0" onMouseExited="#onArenaHovered" onMouseMoved="#onArenaHovered" prefHeight="630.0" prefWidth="480.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="50.0">
+      <GridPane fx:id="arena" layoutX="68.0" layoutY="29.0" onMouseExited="#onArenaHovered" onMouseMoved="#onArenaHovered" onMousePressed="#onArenaClicked" prefHeight="630.0" prefWidth="480.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="50.0">
        
       </GridPane>
       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />

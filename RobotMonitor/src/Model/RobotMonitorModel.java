@@ -124,6 +124,9 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 		Map<Block,CellState> middleRightExploredResults = addExploredBlocks(robotRightSideOrientation,MIDDLE,fifthDigit,true);
 		results.putAll(middleRightExploredResults);
 
+		
+
+
 		///////////////////////////////////////////////////
 		return results;
 	}
@@ -245,8 +248,8 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 		}else{
 //			Testing
 //			Assume the robot can explore the front 3 * 3 cells
-			////////////////////////////////////////////
-					
+			////////////////////////////////////////////			
+			
 					int robotLeftFrontRowID;
 					int robotLeftFrontColID;
 					
@@ -387,9 +390,13 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 
 		for(int rowID = 0; rowID < robotDiameterInCellNum; rowID++){
 			for(int colID = 0;colID < robotDiameterInCellNum; colID++){
-				if(mapStatus[southWestGoalRowID - rowID][southWestGoalColID + colID] == Cell.UNEXMPLORED) continue;
-				mapStatus[southWestGoalRowID - rowID][southWestGoalColID + colID]
+				
+				if(mapStatus[southWestGoalRowID - rowID][southWestGoalColID + colID] == Cell.OBSTACLE){
+					
+				}else if(mapStatus[southWestGoalRowID - rowID][southWestGoalColID + colID] == Cell.EMPTY){
+					mapStatus[southWestGoalRowID - rowID][southWestGoalColID + colID]
 						= Cell.GOAL;
+				}
 			}
 		}
 	}
@@ -402,9 +409,13 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 
 		for(int rowID = 0; rowID < robotDiameterInCellNum; rowID++){
 			for(int colID = 0;colID < robotDiameterInCellNum; colID++){
-				if(mapStatus[southWestStartRowID - rowID][southWestStartColID + colID] == Cell.UNEXMPLORED) continue;
-				mapStatus[southWestStartRowID - rowID][southWestStartColID + colID]
-						= Cell.START;
+				if(mapStatus[southWestStartRowID - rowID][southWestStartColID + colID] == Cell.OBSTACLE){
+					mapStatus[southWestStartRowID - rowID][southWestStartColID + colID] = Cell.OBSTACLE;
+				}else if(mapStatus[southWestStartRowID - rowID][southWestStartColID + colID] == Cell.EMPTY){
+					mapStatus[southWestStartRowID - rowID][southWestStartColID + colID]
+							= Cell.START;
+				}
+			
 			}
 		}
 	}
@@ -512,12 +523,7 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 				//Exploration has finished
 				if(!finishExploration){
 					finishExploration = true;
-
-					//Compute round trip fastest path from start to goal
-//						ArrayList<Action> roundTripActionFastestPath 
-//					= getRoundTripFastestPath(this.robot,
-//							this.explorationComputer.getExploredArena());
-					
+	
 					ArrayList<Action> oneWayTrip = this.pathComputer.computeForFastestPath(
 							this.explorationComputer.getExploredArena(), 
 							robot, 
@@ -562,10 +568,55 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 			this.exploredCells = parseRpiCommand(response);
 			this.explorationComputer.explore();
 		}
-
+		adjustRobot();
 		this.updateStatus();
 	}
+	
+	private void adjustRobot(){
+		CustomizedArena arena = this.explorationComputer.getExploredArena();
+		if(arena.getCell(0, 12) == CellState.OBSTACLE &&
+				arena.getCell(0, 13) == CellState.OBSTACLE &&
+				arena.getCell(0, 14) == CellState.OBSTACLE){
+			
+			arena.setCellState(0, 12, CellState.EMPTY);
+			arena.setCellState(0, 13, CellState.EMPTY);
+			arena.setCellState(0, 14, CellState.EMPTY);
 
+			this.robot.roamNorth();
+		}
+		
+		if(arena.getCell(1, 14) == CellState.OBSTACLE &&
+				arena.getCell(2, 14) == CellState.OBSTACLE){
+			arena.setCellState(1, 14, CellState.EMPTY);
+			arena.setCellState(2, 14, CellState.EMPTY);
+			arena.setCellState(0, 14, CellState.EMPTY);
+			this.robot.roamEast();
+		}
+		
+		if(arena.getCell(17, 0) == CellState.OBSTACLE &&
+				arena.getCell(18, 0) == CellState.OBSTACLE){
+			
+			arena.setCellState(17, 0, CellState.EMPTY);
+			arena.setCellState(18, 0, CellState.EMPTY);
+			arena.setCellState(19, 0, CellState.EMPTY);
+
+			this.robot.roamWest();
+		}
+		
+		if(arena.getCell(19, 0) == CellState.OBSTACLE &&
+				arena.getCell(19, 1) == CellState.OBSTACLE &&
+				arena.getCell(19, 2) == CellState.OBSTACLE){
+			
+			arena.setCellState(19, 2, CellState.EMPTY);
+			arena.setCellState(19, 1, CellState.EMPTY);
+			arena.setCellState(19, 0, CellState.EMPTY);
+			
+			this.robot.roamSouth();
+		}
+		
+		
+	}
+	
 	private ArrayList<Action> getRoundTripFastestPath(Robot robot, CustomizedArena arena) {
 		ArrayList<Action> roundTrip = new ArrayList<>();
 		ArrayList<Action> oneWayTrip = this.pathComputer.computeForFastestPath(arena, 
@@ -635,6 +686,20 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 		}
 		if(ori.equals("W")){
 			this.robot.roamWest();
+		}
+		this.updateStatus();
+	}
+	
+	public void toggleCellState(int rowID,int colID){
+		CellState originalState = this.explorationComputer.getExploredArena().getCell(rowID, colID);
+		if(originalState == CellState.UNEXPLORED){
+			this.explorationComputer.getExploredArena().setCellState(rowID, colID, CellState.OBSTACLE);
+		}
+		if(originalState == CellState.OBSTACLE){
+			this.explorationComputer.getExploredArena().setCellState(rowID, colID, CellState.EMPTY);
+		}		
+		if(originalState == CellState.EMPTY){
+			this.explorationComputer.getExploredArena().setCellState(rowID, colID, CellState.UNEXPLORED);
 		}
 		this.updateStatus();
 	}

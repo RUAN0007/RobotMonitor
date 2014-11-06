@@ -159,7 +159,6 @@ public class RobotMonitorController implements Initializable {
 	
 	@FXML
 	public void onKeyTouched(KeyEvent keyEvent){
-		System.out.println("OnKeyTouched");
 		if(keyEvent.getCode()==KeyCode.UP){
 			this.model.roamRobot("N");
 		}
@@ -353,6 +352,17 @@ public class RobotMonitorController implements Initializable {
 		if(this.model != null){
 			updateCellStateDisplay(rowIndex, columnIndex);
 		}
+	}
+	
+	@FXML
+	public void onArenaClicked(MouseEvent e){
+		double xCdn = e.getSceneX();
+		double yCdn = e.getSceneY();
+
+		int rowID = computeArenaRowIndex(yCdn);
+		int colID = computeArenaColumnIndex(xCdn);
+		this.model.toggleCellState(rowID, colID);
+		this.refleshView();
 	}
 
 	private int computeArenaRowIndex(double yCdn){ //xCdn = Coordinate X on the scene
@@ -635,5 +645,7 @@ public class RobotMonitorController implements Initializable {
 	public void setStage(Stage primaryStage) {
 		this.stage = primaryStage;
 	}
+	
+	
 
 }
