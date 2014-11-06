@@ -130,7 +130,12 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 			Orientation nearestEdge = getNearestEdge(robot);
 			Orientation nextNearestEdge = getNextNearestEdge(robot,nearestEdge);
 			
-			if(!robotOnArenaEdge(robot, nextNearestEdge)){
+			System.out.println("===========================================");
+			System.out.println("Nearest Edge: " + nearestEdge.toString());
+			System.out.println("Second Nearest Edge: " + nextNearestEdge.toString());
+			System.out.println("===========================================");
+
+			if(!robotOnArenaEdge(robot, nearestEdge)){
 				//Move towards nearest edge	
 				firstOrientation = nearestEdge;
 				secondOrientation = nextNearestEdge;

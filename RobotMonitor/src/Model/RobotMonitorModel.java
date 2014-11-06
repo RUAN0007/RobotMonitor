@@ -62,7 +62,7 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 		
 	//	this.explorationComputer = new HalfCycleExplorationComputer(rowCount, colCount, this);
 	//	this.explorationComputer = new FullCornerExplorationComputer(rowCount, colCount, this);
-		this.explorationComputer = new SingleCycleExplorationComputer(rowCount, colCount, this);
+	//	this.explorationComputer = new SingleCycleExplorationComputer(rowCount, colCount, this);
 
 		if(this.robot.getCurrentOrientation().equals(Orientation.WEST)){
 			this.explorationComputer = new SingleCycleExplorationComputer(rowCount, colCount, this);
@@ -77,8 +77,8 @@ public class RobotMonitorModel implements ExplorationEnvironment{
 
 		try {
 			InetAddress ip = InetAddress.getByName(ipAddress);
-			//this.rpi = new JavaClient(ip, Integer.parseInt(portStr));
-			this.rpi = new FakeJavaClient(ip, Integer.parseInt(portStr));
+			this.rpi = new JavaClient(ip, Integer.parseInt(portStr));
+			//this.rpi = new FakeJavaClient(ip, Integer.parseInt(portStr));
 			this.exploredCells = this.parseRpiCommand(this.rpi.recv());
 			this.explorationComputer.explore();
 		} catch (NumberFormatException | IOException e) {
