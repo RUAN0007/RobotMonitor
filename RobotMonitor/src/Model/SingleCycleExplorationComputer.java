@@ -14,6 +14,8 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 	private Orientation firstOrientation = Orientation.WEST;
 	private Orientation secondOrientation = Orientation.SOUTH;
 	private Direction sideOnWallObstacle = Direction.RIGHT;
+	private Orientation orientationBeforeTraveling = Orientation.NORTH;
+
 	//Default action when the left, front and right side of the robot
 	//is obstacled.
 	private Action defaultAction = Action.TURN_LEFT; 
@@ -33,10 +35,16 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 	private boolean hasRobotSideOnEdge = false;
 	private boolean hasOccupiedStartBlock = false;
 	private boolean hasFinishedLooping = false;
-
+	private boolean hasOnStartOrientation = false;
+	
+	
 	@Override
 	public Action getNextStep(Robot robot) {
 		assert(robotSurroundingStatus(robot, robot.getCurrentOrientation()) != -1);
+
+
+		
+		
 		if(!hasTouchedOnEdge){
 			if(!robotOnArenaEdge(robot, firstOrientation)){
 				
@@ -62,9 +70,10 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 			hasRobotSideOnEdge = true;
 
 		}
-
+		
 		if(!hasFinishedLooping){
 			if(robot.getSouthWestBlock().equals(startSouthWestBlock)){
+				
 				if(!hasOccupiedStartBlock){
 				//	System.out.println("Robot has occupied start block...");
 					Action next = moveAlongWallObstacle(robot);
@@ -81,6 +90,11 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 				return moveAlongWallObstacle(robot);
 			}
 		
+		}
+		if(!hasOnStartOrientation){
+			if(!robot.getCurrentOrientation().equals(orientationBeforeTraveling)){
+				return Action.TURN_LEFT;
+			}
 		}
 
 		return null;
@@ -107,6 +121,7 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 		
 		if(!isLost && isLooping()){
 			isLost = true;
+			System.out.println("Enter the lost condition...");
 		}
 		
 		if(isLost){
@@ -129,6 +144,7 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 					return Action.TURN_LEFT;
 				}else{
 					isLost = false;
+					System.out.println("Out of the lost condition...");
 					preDirections.clear();
 					//Go on the normal flow
 				}
@@ -298,7 +314,7 @@ public class SingleCycleExplorationComputer extends ExplorationComputer {
 			return false;
 		}
 		
-		for(int id = 3;id >= 1;id++){
+		for(int id = 3;id >= 1;id--){
 			if(this.preDirections.get(size - id - 1).equals(Direction.AHEAD)){
 				return false;
 			}
